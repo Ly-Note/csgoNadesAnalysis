@@ -25,9 +25,7 @@ from django import forms
 class UploadFileForm(forms.Form):
     title = forms.CharField(max_length=50)
     file = forms.FileField()
-    def save():
-        print("save")
-        return
+
         
     
 class NameForm(forms.Form):

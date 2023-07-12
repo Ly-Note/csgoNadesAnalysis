@@ -1,11 +1,12 @@
 from django.shortcuts import render
 from django.views.generic.edit import FormView
-from django.http import HttpResponseRedirect
-from django.http import HttpResponse
+from django.http import HttpResponseRedirect,JsonResponse,HttpResponse
 from .forms import NameForm,ContactForm,UploadFileForm
 from django.forms import ModelForm
-
-import os
+from django.views.decorators.csrf import csrf_exempt
+from .models import Series,Match,Hurt,Player
+import json
+import datetime
 
 def index(request):
     return HttpResponse("Hello, world. You're at the polls index.")
@@ -14,86 +15,83 @@ def index(request):
 def sucess(request):
     return render(request, "matches/uploads_sucess.html")
 
+@csrf_exempt
+def upload_json(request):
+    if request.method == 'POST':
+        str_series = request.GET.get('extra_param', None)
+        if(str_series is None):
+          return JsonResponse({'error': 'extra_param is null'}, status=400)
 
-# def get_name(request):
-#     # if this is a POST request we need to process the form data
-#     if request.method == "POST":
-#         # create a form instance and populate it with data from the request:
-#         form = NameForm(request.POST)
-#         # check whether it's valid:
-#         if form.is_valid():
-#             # process the data in form.cleaned_data as required
-#             # ...
-#             # redirect to a new URL:
-#             return HttpResponseRedirect("/matches")
+        str_data = request.body.decode('utf-8') 
+        
+        
+        data = json.loads(str_data)
+        s=createSeries(str_series)
+        m = createMatch(data,s)
+        exists = Match.objects.filter(matchId=data['id']).exists()
+        if exists:
+            print("Blog object exists")
+        else:
+            createHurt(data,m)
+            print("Blog object does not exist")
+        
+        
+        createPlayer(data,m)
 
-#     # if a GET (or any other method) we'll create a blank form
-#     else:
-#         form = NameForm()
-
-#     return render(request, "matches/uploads.html", {"form": form})
-
-# def get_name(request):
-#     # if this is a POST request we need to process the form data
-#     if request.method == "POST":
-#         # create a form instance and populate it with data from the request:
-#         form = ContactForm(request.POST)
-#         # check whether it's valid:
-#         if form.is_valid():
-#            subject = form.cleaned_data["subject"]
-#            message = form.cleaned_data["message"]
-#            sender = form.cleaned_data["sender"]
-#            cc_myself = form.cleaned_data["cc_myself"]
-
-#            recipients = ["info@example.com"]
-#            if cc_myself:
-#                recipients.append(sender)
-
-#            print("sendmail")
-#           # send_mail(subject, message, sender, recipients)
-#            return HttpResponseRedirect("/matches")
-
-#     # if a GET (or any other method) we'll create a blank form
-#     else:
-#         form = ContactForm()
-
-#     return render(request, "matches/uploads.html", {"form": form})
-
-
-def upload_file(request):
-    if request.method == "POST":
-        form = UploadFileForm(request.POST, request.FILES)
-        if form.is_valid():
-            # file is saved
-            file = request.FILES['file']
-            # print ("is_valid: %s", title)
-            print (form.cleaned_data["title"])
-            # todo 
-            f = open(os.path.join("C:\\3.Work\\Python_code\\csgoNadesAnalysis\\mysite","1.png"),"wb+")
-            for chunk in file.chunks():
-                f.write(chunk)
-            f.close()
-            return HttpResponseRedirect("/matches")
+        return JsonResponse({'message': 'Created'}, status=201)
     else:
-        form = UploadFileForm()
-    return render(request, "matches/uploads.html", {"form": form})
+        return JsonResponse({'error': 'Invalid request'}, status=400)
 
+def createSeries(str_series):
+    series = Series(seriesName = str_series)
+    series.save()
+    return series
 
-# class FileFieldFormView(FormView):
-#     form_class = FileFieldForm
-#     template_name = "matches/uploads.html"  # Replace with your template.
-#     success_url = "matches/uploads_sucess.html"  # Replace with your URL or reverse().
+def createMatch(data,s):
+    t= datetime.datetime.fromisoformat(data['date'])
+    m = Match(series = s,matchId = data['id'],
+                  matchName=data['NameWithoutExtension'],dateTime = t,
+                  duration = data['duration'],team1Name = data['team_ct']['team_name'],
+                  team2Name = data['team_t']['team_name'],team1Score = data['team_ct']['score'],
+                  team2Score = data['team_t']['score'],ticks = data['ticks']
+                  )
+    m.save()
+    return m 
 
-#     def post(self, request, *args, **kwargs):
-#         form_class = self.get_form_class()
-#         form = self.get_form(form_class)
-#         if form.is_valid():
-#             return self.form_valid(form)
-#         else:
-#             return self.form_invalid(form)
+def createHurt(data,m):
+        playerHurted = data['player_hurted']
+        for h in playerHurted :
+            # molotov 502
+            if h['weapon']['element'] == 502  :
+                hurt = Hurt(match=m,steamid = h['attacker_steamid'],nadeDamage =0,
+                                molotovDamage=h['health_damage'],incendiaryDamage=0,
+                                roundNumber = h['round_number'],
+                                tick=h['tick'],hurtedSteamid=h['hurted_steamid'])
+            # 燃烧弹503 
+            elif h['weapon']['element']==503:
+                hurt = Hurt(match=m,steamid = h['attacker_steamid'],nadeDamage =0,
+                                molotovDamage=0,incendiaryDamage=h['health_damage'],
+                                roundNumber = h['round_number'],
+                                tick=h['tick'],hurtedSteamid=h['hurted_steamid'])
+            # 手雷506
+            elif h['weapon']['element']==506:
+                hurt = Hurt(match=m,steamid = h['attacker_steamid'],incendiaryDamage =0,
+                                molotovDamage=0,nadeDamage=h['health_damage'],
+                                roundNumber = h['round_number'],
+                                tick=h['tick'],hurtedSteamid=h['hurted_steamid'])
+                
+            else:
+                continue
+            hurt.save()
+                
+        return 
 
-#     def form_valid(self, form):
-#         files = form.cleaned_data["file_field"]
-#         for f in files:
-#             ...  # Do something with each file.
-#         return super().form_valid()
+def createPlayer(data,m):
+    players = data['players']
+    for p in players:
+        player = Player(match = m,steamid = p['steamid'],name = p['name'])
+        player.save()
+    return 
+    
+    
+    
