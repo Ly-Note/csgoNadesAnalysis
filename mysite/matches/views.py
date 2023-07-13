@@ -33,10 +33,11 @@ def upload_json(request):
             print("Blog object exists")
         else:
             createHurt(data,m)
+            createPlayer(data,m)
             print("Blog object does not exist")
         
         
-        createPlayer(data,m)
+        
 
         return JsonResponse({'message': 'Created'}, status=201)
     else:
