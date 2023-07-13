@@ -27,11 +27,12 @@ def upload_json(request):
         
         data = json.loads(str_data)
         s=createSeries(str_series)
-        m = createMatch(data,s)
+        
         exists = Match.objects.filter(matchId=data['id']).exists()
         if exists:
             print("Blog object exists")
         else:
+            m = createMatch(data,s)
             createHurt(data,m)
             createPlayer(data,m)
             print("Blog object does not exist")
