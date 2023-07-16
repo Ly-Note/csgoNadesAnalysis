@@ -1,0 +1,11 @@
+
+{% if matches_list %}
+    <ul>
+    {% for match in matches_list %}
+      <!--  <li><a href="/polls/{{ question.id }}/">{{ question.question_text }}</a></li> -->
+        <li><a href="{% url 'match:hurt' match.series.seriesName match.matchId %}">{{ match.matchId }}  : {{ match.series.seriesName }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No polls are available.</p>
+{% endif %}

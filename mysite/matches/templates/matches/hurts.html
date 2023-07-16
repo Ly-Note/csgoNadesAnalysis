@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hurts</title>
+    <style>
+        .flex-container {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+            flex-wrap: wrap;
+        }
+        .table-container {
+            margin: 10px;
+        }
+        table, th, td {
+            border: 1px solid black;
+            border-collapse: collapse;
+            padding: 5px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="flex-container">
+
+
+        <div class="table-container">
+            <h2>单颗手雷道具</h2>
+            <table>
+                <tr>
+                    <th>Steam ID</th>
+                    <th>tick</th>
+                    <th>Round Number</th>
+                    <th>Total Damage</th>
+                </tr>
+                <!-- ... 表头和表格内容 ... -->
+                {% for d in onds %}
+                <tr>
+                    <!-- ... 表格内容 ... -->
+                    <td>{{ d.steamid }}</td>
+                    <td>{{ d.tick }}</td>
+                    <td>{{ d.roundNumber }}</td>
+                    <td>{{ d.total_Damage }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+        <div class="table-container">
+            <h2>回合手雷伤害</h2>
+            <table>
+                <tr>
+                    <th>Steam ID</th>
+                    <th>Round Number</th>
+                    <th>Total Damage</th>
+                </tr>
+                {% for d in onds %}
+                <tr>
+                    <td>{{ d.steamid }}</td>
+                    <td>{{ d.roundNumber }}</td>
+                    <td>{{ d.total_Damage }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+        <!-- 更多数据集 -->
+        <div class="table-container">
+            <h2>回合燃烧弹伤害</h2>
+            <table>
+                <tr>
+                    <th>Steam ID</th>
+                    <th>Round Number</th>
+                    <th>Total Damage</th>
+                </tr>
+                <!-- ... 表头和表格内容 ... -->
+                {% for d in rmids %}
+                <tr>
+                    <!-- ... 表格内容 ... -->
+                    <td>{{ d.steamid }}</td>
+                    <td>{{ d.roundNumber }}</td>
+                    <td>{{ d.total_Damage }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+                <!-- 更多数据集 -->
+        <div class="table-container">
+            <h2>回合道具伤害</h2>
+            <table>
+                <tr>
+                    <th>Steam ID</th>
+                    <th>Round Number</th>
+                    <th>Total Damage</th>
+                </tr>
+                <!-- ... 表头和表格内容 ... -->
+                {% for d in rwds %}
+                <tr>
+                    <!-- ... 表格内容 ... -->
+                    <td>{{ d.steamid }}</td>
+                    <td>{{ d.roundNumber }}</td>
+                    <td>{{ d.total_Damage }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+
+        <div class="table-container">
+            <h2>整场比赛手雷伤害</h2>
+            <table>
+                <tr>
+                    <th>Steam ID</th>
+                    <th>Total Damage</th>
+                </tr>
+                <!-- ... 表头和表格内容 ... -->
+                {% for d in wnds %}
+                <tr>
+                    <!-- ... 表格内容 ... -->
+                    <td>{{ d.steamid }}</td>
+                    <td>{{ d.total_Damage }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+        <div class="table-container">
+            <h2>整场比赛燃烧弹伤害</h2>
+            <table>
+                <tr>
+                    <th>Steam ID</th>
+                    <th>Total Damage</th>
+                </tr>
+                <!-- ... 表头和表格内容 ... -->
+                {% for d in wmids %}
+                <tr>
+                    <!-- ... 表格内容 ... -->
+                    <td>{{ d.steamid }}</td>
+                    <td>{{ d.total_Damage }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+        <div class="table-container">
+            <h2>整场比赛道具伤害</h2>
+            <table>
+                <tr>
+                    <th>Steam ID</th>
+                    <th>Total Damage</th>
+                </tr>
+                <!-- ... 表头和表格内容 ... -->
+                {% for d in wwds %}
+                <tr>
+                    <!-- ... 表格内容 ... -->
+                    <td>{{ d.steamid }}</td>
+                    <td>{{ d.total_Damage }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+        <div class="table-container">
+            <h2>回合受手雷伤害</h2>
+            <table>
+                <tr>
+                    <th>Steam ID</th>
+                    <th>Round Number</th>
+                    <th>Total Damage</th>
+                </tr>
+                <!-- ... 表头和表格内容 ... -->
+                {% for d in hrnds %}
+                <tr>
+                    <!-- ... 表格内容 ... -->
+                    <td>{{ d.hurtedSteamid }}</td>
+                    <td>{{ d.roundNumber }}</td>
+                    <td>{{ d.total_Damage }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+        <div class="table-container">
+            <h2>回合受燃烧弹伤害</h2>
+            <table>
+                <tr>
+                    <th>Steam ID</th>
+                    <th>Round Number</th>
+                    <th>Total Damage</th>
+                </tr>
+                <!-- ... 表头和表格内容 ... -->
+                {% for d in hrmids %}
+                <tr>
+                    <!-- ... 表格内容 ... -->
+                    <td>{{ d.hurtedSteamid }}</td>
+                    <td>{{ d.roundNumber }}</td>
+                    <td>{{ d.total_Damage }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+        <div class="table-container">
+            <h2>回合受道具伤害</h2>
+            <table>
+                <tr>
+                    <th>Steam ID</th>
+                    <th>Round Number</th>
+                    <th>Total Damage</th>
+                </tr>
+                <!-- ... 表头和表格内容 ... -->
+                {% for d in hrwds %}
+                <tr>
+                    <!-- ... 表格内容 ... -->
+                    <td>{{ d.hurtedSteamid }}</td>
+                    <td>{{ d.roundNumber }}</td>
+                    <td>{{ d.total_Damage }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+        <div class="table-container">
+            <h2>整场比赛受手雷伤害</h2>
+            <table>
+                <tr>
+                    <th>Steam ID</th>
+                    <th>Total Damage</th>
+                </tr>
+                <!-- ... 表头和表格内容 ... -->
+                {% for d in hwnds %}
+                <tr>
+                    <!-- ... 表格内容 ... -->
+                    <td>{{ d.hurtedSteamid }}</td>
+                    <td>{{ d.total_Damage }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+        <div class="table-container">
+            <h2>整场比赛受燃烧弹伤害</h2>
+            <table>
+                <tr>
+                    <th>Steam ID</th>
+                    <th>Total Damage</th>
+                </tr>
+                <!-- ... 表头和表格内容 ... -->
+                {% for d in hwmids %}
+                <tr>
+                    <!-- ... 表格内容 ... -->
+                    <td>{{ d.hurtedSteamid }}</td>
+                    <td>{{ d.total_Damage }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+        <div class="table-container">
+            <h2>整场比赛受道具伤害</h2>
+            <table>
+                <tr>
+                    <th>Steam ID</th>
+                    <th>Total Damage</th>
+                </tr>
+                <!-- ... 表头和表格内容 ... -->
+                {% for d in hwwds %}
+                <tr>
+                    <!-- ... 表格内容 ... -->
+                    <td>{{ d.hurtedSteamid }}</td>
+                    <td>{{ d.total_Damage }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+        <!-- 以此类推，为每个数据集创建一个新的表格 -->
+        <!-- rmids, rwds, wnds, wmids, wwds, hrnds, hrmids, hrwds, hwnds, hwmids, hwwds -->
+
+    </div>
+</body>
+</html>
+</body>
+</html>

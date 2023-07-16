@@ -1,1 +1,11 @@
-index
+
+{% if series_list %}
+    <ul>
+    {% for series in series_list %}
+      <!--  <li><a href="/polls/{{ question.id }}/">{{ question.question_text }}</a></li> -->
+        <li><a href="{% url 'match:matches'  series.seriesName %}">{{ series.seriesName }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No polls are available.</p>
+{% endif %}
