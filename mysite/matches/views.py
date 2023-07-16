@@ -30,12 +30,12 @@ def sucess(request):
     id = "de_ancient_6001606039256035681662955289451887704"
     m = Match.objects.get(matchId=id)   
     #回合道具伤害（手雷，燃烧弹，道具伤害）
-    m.hurt_set.values('steamid', 'roundNumber').annotate(total_nadeDamage=Sum('nadeDamage'))
-    m.hurt_set.values('steamid', 'roundNumber').annotate(total_molotovIncendiaryDamage=Sum('molotovDamage')+Sum('incendiaryDamage'))
-    m.hurt_set.values('steamid', 'roundNumber').annotate(total_wholeDamage=Sum('nadeDamage')+Sum('molotovDamage')+Sum('incendiaryDamage'))
+    m.hurt_set.values('steamid', 'roundNumber').annotate(total_Damage=Sum('nadeDamage'))
+    m.hurt_set.values('steamid', 'roundNumber').annotate(total_Damage=Sum('molotovDamage')+Sum('incendiaryDamage'))
+    m.hurt_set.values('steamid', 'roundNumber').annotate(total_Damage=Sum('nadeDamage')+Sum('molotovDamage')+Sum('incendiaryDamage'))
    
     #单颗手雷道具（手雷）
-    m.hurt_set.values('steamid', 'tick','roundNumber').annotate(total_nadeDamage=Sum('nadeDamage'))
+    m.hurt_set.values('steamid', 'tick','roundNumber').annotate(total_Damage=Sum('nadeDamage'))
     
     #受道具伤害（手雷，燃烧弹，道具伤害）
     m.hurt_set.values('hurtedSteamid', 'roundNumber').annotate(total_nadeHurt=Sum('nadeDamage'))
@@ -43,15 +43,15 @@ def sucess(request):
     m.hurt_set.values('hurtedSteamid', 'roundNumber').annotate(total_wholeHurt=Sum('nadeDamage')+Sum('molotovDamage')+Sum('incendiaryDamage'))
 
     #整场比赛（手雷，燃烧弹，道具伤害）
-    m.hurt_set.values('steamid').annotate(total_nadeDamage=Sum('nadeDamage'))
-    m.hurt_set.values('steamid').annotate(total_nadeDamage=Sum('molotovDamage')+Sum('incendiaryDamage'))
-    m.hurt_set.values('steamid').annotate(total_nadeDamage=Sum('nadeDamage')+Sum('molotovDamage')+Sum('incendiaryDamage'))
+    m.hurt_set.values('steamid').annotate(total_Damage=Sum('nadeDamage'))
+    m.hurt_set.values('steamid').annotate(total_Damage=Sum('molotovDamage')+Sum('incendiaryDamage'))
+    m.hurt_set.values('steamid').annotate(total_Damage=Sum('nadeDamage')+Sum('molotovDamage')+Sum('incendiaryDamage'))
 
 
     #整场比赛承伤（手雷，燃烧弹，道具伤害）
-    m.hurt_set.values('hurtedSteamid').annotate(total_nadeDamage=Sum('nadeDamage'))
-    m.hurt_set.values('hurtedSteamid').annotate(total_nadeDamage=Sum('molotovDamage')+Sum('incendiaryDamage'))
-    m.hurt_set.values('hurtedSteamid').annotate(total_nadeDamage=Sum('nadeDamage')+Sum('molotovDamage')+Sum('incendiaryDamage'))
+    m.hurt_set.values('hurtedSteamid').annotate(total_Damage=Sum('nadeDamage'))
+    m.hurt_set.values('hurtedSteamid').annotate(total_Damage=Sum('molotovDamage')+Sum('incendiaryDamage'))
+    m.hurt_set.values('hurtedSteamid').annotate(total_Damage=Sum('nadeDamage')+Sum('molotovDamage')+Sum('incendiaryDamage'))
     #print(testm)
     
     return render(request, "matches/uploads_sucess.html")
@@ -60,46 +60,72 @@ def sucess(request):
 def hurtsList(request,seriesName,matchId):
     s = Series.objects.get(seriesName=seriesName)
     m = s.match_set.get(matchId = matchId)
+    # onds:one nade damages 
     #单颗手雷道具（按从大到小来排序）
-    m.hurt_set.values('steamid', 'tick','roundNumber').annotate(total_nadeDamage=Sum('nadeDamage')).filter(total_nadeDamage__gt=0).order_by('-total_nadeDamage')
+    onds= m.hurt_set.values('steamid', 'tick','roundNumber').annotate(total_Damage=Sum('nadeDamage')).filter(total_Damage__gt=0).order_by('-total_Damage')
     
+    # rnds:round nade damages
+    # rmids:round molotovIncendiary damages
+    # rwds:round nade and molotovIncendiary damages
     #回合道具伤害（手雷，燃烧弹，道具伤害）（按从大到小来排序）
-    m.hurt_set.values('steamid', 'roundNumber').annotate(total_nadeDamage=Sum('nadeDamage')).order_by('-total_nadeDamage')
-    m.hurt_set.values('steamid', 'roundNumber').annotate(total_molotovIncendiaryDamage=Sum('molotovDamage')+Sum('incendiaryDamage')).order_by('-total_molotovIncendiaryDamage')
-    hurts=m.hurt_set.values('steamid', 'roundNumber').annotate(total_wholeDamage=Sum('nadeDamage')+Sum('molotovDamage')+Sum('incendiaryDamage')).order_by('-total_wholeDamage')
+    rnds  = m.hurt_set.values('steamid', 'roundNumber').annotate(total_Damage=Sum('nadeDamage')).order_by('-total_Damage').filter(total_Damage__gt=0)
+    rmids = m.hurt_set.values('steamid', 'roundNumber').annotate(total_Damage=Sum('molotovDamage')+Sum('incendiaryDamage')).order_by('-total_Damage').filter(total_Damage__gt=0)
+    rwds=m.hurt_set.values('steamid', 'roundNumber').annotate(total_Damage=Sum('nadeDamage')+Sum('molotovDamage')+Sum('incendiaryDamage')).order_by('-total_Damage').filter(total_Damage__gt=0)
    
     #整场比赛（手雷，燃烧弹，道具伤害）（按从大到小来排序）
-    m.hurt_set.values('steamid').annotate(total_nadeDamage=Sum('nadeDamage')).order_by('-total_nadeDamage')
-    m.hurt_set.values('steamid').annotate(total_molotovIncendiaryDamage=Sum('molotovDamage')+Sum('incendiaryDamage')).order_by('-total_molotovIncendiaryDamage')
-    m.hurt_set.values('steamid').annotate(total_wholeDamage=Sum('nadeDamage')+Sum('molotovDamage')+Sum('incendiaryDamage')).order_by('-total_wholeDamage')
+    wnds = m.hurt_set.values('steamid').annotate(total_Damage=Sum('nadeDamage')).order_by('-total_Damage').filter(total_Damage__gt=0)
+    wmids = m.hurt_set.values('steamid').annotate(total_Damage=Sum('molotovDamage')+Sum('incendiaryDamage')).order_by('-total_Damage').filter(total_Damage__gt=0)
+    wwds = m.hurt_set.values('steamid').annotate(total_Damage=Sum('nadeDamage')+Sum('molotovDamage')+Sum('incendiaryDamage')).order_by('-total_Damage').filter(total_Damage__gt=0)
    
     #回合受道具伤害（手雷，燃烧弹，道具伤害）（按从大到小来排序）
-    m.hurt_set.values('hurtedSteamid', 'roundNumber').annotate(nadeDamage=Sum('nadeDamage')).order_by('-nadeDamage')
-    m.hurt_set.values('hurtedSteamid', 'roundNumber').annotate(total_molotovIncendiaryDamage=Sum('molotovDamage')+Sum('incendiaryDamage')).order_by('-total_molotovIncendiaryDamage')
-    m.hurt_set.values('hurtedSteamid', 'roundNumber').annotate(total_wholeDamage=Sum('nadeDamage')+Sum('molotovDamage')+Sum('incendiaryDamage')).order_by('-total_wholeDamage')
+    hrnds = m.hurt_set.values('hurtedSteamid', 'roundNumber').annotate(total_Damage=Sum('nadeDamage')).order_by('-total_Damage').filter(total_Damage__gt=0)
+    hrmids =  m.hurt_set.values('hurtedSteamid', 'roundNumber').annotate(total_Damage=Sum('molotovDamage')+Sum('incendiaryDamage')).order_by('-total_Damage').filter(total_Damage__gt=0)
+    hrwds = m.hurt_set.values('hurtedSteamid', 'roundNumber').annotate(total_Damage=Sum('nadeDamage')+Sum('molotovDamage')+Sum('incendiaryDamage')).order_by('-total_Damage').filter(total_Damage__gt=0)
 
+
+    # hwwds:hurt of whole round whole damages
     #整场比赛承伤（手雷，燃烧弹，道具伤害）
-    m.hurt_set.values('hurtedSteamid').annotate(total_nadeDamage=Sum('nadeDamage')).order_by('-total_nadeDamage')
-    m.hurt_set.values('hurtedSteamid').annotate(total_molotovIncendiaryDamage=Sum('molotovDamage')+Sum('incendiaryDamage')).order_by('-total_molotovIncendiaryDamage')
-    m.hurt_set.values('hurtedSteamid').annotate(total_wholeDamage=Sum('nadeDamage')+Sum('molotovDamage')+Sum('incendiaryDamage')).order_by('-total_wholeDamage')
+    hwnds = m.hurt_set.values('hurtedSteamid').annotate(total_Damage=Sum('nadeDamage')).order_by('-total_Damage')
+    hwmids = m.hurt_set.values('hurtedSteamid').annotate(total_Damage=Sum('molotovDamage')+Sum('incendiaryDamage')).order_by('-total_Damage')
+    hwwds = m.hurt_set.values('hurtedSteamid').annotate(total_Damage=Sum('nadeDamage')+Sum('molotovDamage')+Sum('incendiaryDamage')).order_by('-total_Damage')
    
     
+
     players = Player.objects.all()
     player_dict = {player.steamid: player for player in players}
     
-    print(steamId2SteamName(player_dict,hurts))
-    
-    return HttpResponse("Hello, world. You're at the hurtsList index.")
+    steamId2SteamName(player_dict,onds,rnds,rmids,rwds,wnds,wmids,wwds)
+    hurtedSteamid2SteamName(player_dict,hrnds,hrmids,hrwds,hwnds,hwmids,hwwds)
 
-def steamId2SteamName(player_dict,listData):
-    for d in listData:
-        steamid = d['steamid']
-        player = player_dict.get(steamid)
-        if player is not None:
-            d['steamid'] = player.name
-        else:
-            d['steamid'] = 'Unknown'
-    return listData
+    
+    return render(request, 'matches/hurts.html', 
+                  {'onds': onds,
+                   'rnds':rnds, 'rmids':rmids, 'rwds':rwds, 
+                   'wnds':wnds,'wmids':wmids,'wwds':wwds,
+                   'hrnds':hrnds,'hrmids':hrmids,'hrwds':hrwds,
+                   'hwnds':hwnds,'hwmids':hwmids,'hwwds':hwwds,})
+
+def steamId2SteamName(player_dict,*listDatas):
+    for listData in listDatas:
+        for d in listData:
+            steamid = d['steamid']
+            player = player_dict.get(steamid)
+            if player is not None:
+                d['steamid'] = player.name
+            else:
+                d['steamid'] = 'Unknown'
+    return 
+
+def hurtedSteamid2SteamName(player_dict,*listDatas):
+    for listData in listDatas:
+        for d in listData:
+            steamid = d['hurtedSteamid']
+            player = player_dict.get(steamid)
+            if player is not None:
+                d['hurtedSteamid'] = player.name
+            else:
+                d['hurtedSteamid'] = 'Unknown'
+    return
     
 
 class SeriesView(ListView):
